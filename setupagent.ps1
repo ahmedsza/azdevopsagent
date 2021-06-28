@@ -8,6 +8,11 @@ param (
 Start-Transcript
 Write-Host "start"
 
+echo $URL
+echo $PAT
+echo $POOL
+echo $AGENT
+
 #test if an old installation exists, if so, delete the folder
 if (test-path "c:\agent")
 {
@@ -17,12 +22,13 @@ if (test-path "c:\agent")
 #create a new folder
 new-item -ItemType Directory -Force -Path "c:\agent"
 set-location "c:\agent"
-
+$global:ProgressPreference = 'SilentlyContinue'
 $env:VSTS_AGENT_HTTPTRACE = $true
 
 #github requires tls 1.2
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+$ProgressPreference = 'SilentlyContinue'
 #get the latest build agent version
 $wr = Invoke-WebRequest https://api.github.com/repos/Microsoft/azure-pipelines-agent/releases/latest -UseBasicParsing
 $tag = ($wr | ConvertFrom-Json)[0].tag_name
@@ -38,8 +44,9 @@ Invoke-WebRequest $download -Out agent.zip
 #expand the zip
 Expand-Archive -Path agent.zip -DestinationPath $PWD
 
+echo "--unattended --url $URL --auth pat --token "$PAT" --pool $POOL --agent $AGENT --acceptTeeEula --runAsService"
 #run the config script of the build agent
-.\config.cmd --unattended --url "$URL" --auth pat --token "$PAT" --pool "$POOL" --agent "$AGENT" --acceptTeeEula --runAsService
+.\config.cmd --unattended --url $URL --auth pat --token "$PAT" --pool $POOL --agent $AGENT --acceptTeeEula --runAsService
 
 #exit
 Stop-Transcript
