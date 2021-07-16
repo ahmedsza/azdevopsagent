@@ -45,7 +45,7 @@ Invoke-WebRequest $download -Out agent.zip
 Expand-Archive -Path agent.zip -DestinationPath $PWD
 
 echo "--unattended --url $URL --auth pat --token "$PAT" --pool $POOL --agent $AGENT --acceptTeeEula --runAsService"
-#run the config script of the build agent
+#run the config script of the build agent. added replace to config
 .\config.cmd --unattended --url $URL --auth pat --token "$PAT" --pool $POOL --agent $AGENT --acceptTeeEula --runAsService --replace
 
 #exit
